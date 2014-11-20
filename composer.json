@@ -1,0 +1,27 @@
+{
+    "name": "wowe/laravel-eloquent-scopes",
+    "description": "Some general scopes for Eloquent",
+    "keywords": ["laravel", "eloquent", "scopes"],
+    "homepage": "https://github.com/willrowe/laravel-eloquent-scopes",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Will Rowe",
+            "email": "wrowe@will-rowe.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "illuminate/database": "4.2.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Wowe\\Eloquent\\Scopes\\": "src/EloquentScopes"
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~4.2.5",
+        "orchestra/testbench": "2.2.*"
+    },
+    "minimum-stability": "stable"
+}
