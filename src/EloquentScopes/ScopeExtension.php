@@ -49,7 +49,7 @@ class ScopeExtension
                 return $bindingLocation;
             }
             if (is_string($bindingLocation)) {
-                return $where[$bindingLocation];
+                return count((array)$where[$bindingLocation]);
             }
             if (is_callable($bindingLocation)) {
                 return call_user_func($bindingLocation, $where);
@@ -64,17 +64,16 @@ class ScopeExtension
     {
         $callbackParameters = (func_num_args() > 2) ? array_slice(func_get_args(), 2) : [];
         $query = $builder->getQuery();
+        $bindings = $query->getRawBindings()['where'];
         $bindingIndex = 0;
         foreach ((array) $query->wheres as $key => $where) {
             if (call_user_func_array($matchCallback, array_merge([$where], $callbackParameters))) {
                 unset($query->wheres[$key]);
-                $query->wheres = array_values($query->wheres);
-                $bindings = $query->getRawBindings()['where'];
                 unset($bindings[$bindingIndex]);
-                $query->setBindings($bindings);
             }
-
             $bindingIndex += $this->getBindingCount($where);
         }
+        $query->wheres = array_values($query->wheres);
+        $query->setBindings($bindings);
     }
 }
