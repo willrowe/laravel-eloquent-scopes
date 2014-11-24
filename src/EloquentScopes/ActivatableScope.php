@@ -2,46 +2,17 @@
 
 namespace Wowe\Eloquent\Scopes;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\ScopeInterface;
+use Illuminate\Database\Eloquent\Builder;
 
-class ActivatableScope implements ScopeInterface
+class ActivatableScope extends ScopeExtension implements ScopeInterface
 {
-
-    /**
-     * A map of the where types and how to determine the
-     * number of bindings it generated.
-     * 
-     * @var array
-     */
-    private $whereTypes = [
-        'Basic' => 'value',
-        'raw' => ['static', 'getRawBindingCount'],
-        'between' => 2,
-        'NotIn' => 'values',
-        'In' => 'values',
-        'Day' => 'value',
-        'Month' => 'value',
-        'Year' => 'value'
-    ];
-
     /**
      * All of the extensions to be added to the builder.
      *
      * @var array
      */
     protected $extensions = ['WithInactive', 'OnlyInactive'];
-
-    /**
-     * Determines how many PDO bindings are in the where SQL.
-     * 
-     * @param  array   $where
-     * @return integer        The number of bindings.
-     */
-    private static function getRawBindingCount(array $where)
-    {
-        return substr_count($where['sql'], '?');
-    }
 
     /**
      * Apply the scope to a given Eloquent query builder.
@@ -66,47 +37,7 @@ class ActivatableScope implements ScopeInterface
      */
     public function remove(Builder $builder)
     {
-        $column = $builder->getModel()->getQualifiedActiveColumn();
-
-        $query = $builder->getQuery();
-        $bindingIndex = 0;
-        foreach ((array) $query->wheres as $key => $where) {
-            if ($this->isActiveConstraint($where, $column)) {
-                unset($query->wheres[$key]);
-                $query->wheres = array_values($query->wheres);
-                $bindings = $query->getRawBindings()['where'];
-                unset($bindings[$bindingIndex]);
-                $query->setBindings($bindings);
-            }
-
-            $bindingIndex += $this->getBindingCount($where);
-        }
-    }
-
-    /**
-     * Determine how many bindings the where has.
-     * 
-     * @param  array $where
-     * @return integer The number of bindings
-     */
-    private function getBindingCount(array $where)
-    {
-        if (array_key_exists($where['type'], $this->whereTypes)) {
-            $bindingLocation = $this->whereTypes[$where['type']];
-
-            if (is_int($bindingLocation)) {
-                return $bindingLocation;
-            }
-            if (is_string($bindingLocation)) {
-                return $where[$bindingLocation];
-            }
-            if (is_callable($bindingLocation)) {
-                return call_user_func($bindingLocation, $where);
-            }
-            return 1;
-        }
-
-        return 0;
+        $this->removeWhere($builder, [$this, 'isActivatableConstraint'], $builder->getModel()->getQualifiedActiveColumn());
     }
 
     /**
@@ -161,7 +92,7 @@ class ActivatableScope implements ScopeInterface
      * @param  string  $column
      * @return bool
      */
-    protected function isActiveConstraint(array $where, $column)
+    protected function isActivatableConstraint(array $where, $column)
     {
         return $where['type'] == 'Basic' && $where['operator'] == '=' && $where['column'] == $column && $where['value'] == 1;
     }
