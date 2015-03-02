@@ -4,6 +4,7 @@ namespace Wowe\Eloquent\Scopes;
 
 use Illuminate\Database\Eloquent\ScopeInterface;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 class WhereScope extends ScopeExtension implements ScopeInterface
 {
@@ -11,11 +12,12 @@ class WhereScope extends ScopeExtension implements ScopeInterface
      * Apply the scopes to a given Eloquent query builder.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $builder
+     * @param  \Illuminate\Database\Eloquent\Model    $model
      * @return void
      */
-    public function apply(Builder $builder)
+    public function apply(Builder $builder, Model $model)
     {
-        foreach ($builder->getModel()->getWhereScopes() as $scope) {
+        foreach ($model->getWhereScopes() as $scope) {
             $builder->where($scope['column'], $scope['operator'], $scope['value']);
         }
     }
@@ -24,11 +26,12 @@ class WhereScope extends ScopeExtension implements ScopeInterface
      * Remove the scopes from the given Eloquent query builder.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $builder
+     * @param  \Illuminate\Database\Eloquent\Model    $model
      * @return void
      */
-    public function remove(Builder $builder)
+    public function remove(Builder $builder, Model $model)
     {
-        $this->removeWhere($builder, [$this, 'isConstraint'], $builder->getModel()->getWhereScopes());
+        $this->removeWhere($builder, [$this, 'isConstraint'], $model->getWhereScopes());
     }
 
     /**

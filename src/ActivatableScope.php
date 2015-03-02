@@ -4,6 +4,7 @@ namespace Wowe\Eloquent\Scopes;
 
 use Illuminate\Database\Eloquent\ScopeInterface;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 class ActivatableScope extends ScopeExtension implements ScopeInterface
 {
@@ -18,12 +19,11 @@ class ActivatableScope extends ScopeExtension implements ScopeInterface
      * Apply the scope to a given Eloquent query builder.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $builder
+     * @param  \Illuminate\Database\Eloquent\Model    $model
      * @return void
      */
-    public function apply(Builder $builder)
+    public function apply(Builder $builder, Model $model)
     {
-        $model = $builder->getModel();
-
         $builder->where($model->getQualifiedActiveColumn(), 1);
 
         $this->extend($builder);
@@ -33,11 +33,12 @@ class ActivatableScope extends ScopeExtension implements ScopeInterface
      * Remove the scope from the given Eloquent query builder.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $builder
+     * @param  \Illuminate\Database\Eloquent\Model    $model
      * @return void
      */
-    public function remove(Builder $builder)
+    public function remove(Builder $builder, Model $model)
     {
-        $this->removeWhere($builder, [$this, 'isActivatableConstraint'], $builder->getModel()->getQualifiedActiveColumn());
+        $this->removeWhere($builder, [$this, 'isActivatableConstraint'], $model->getQualifiedActiveColumn());
     }
 
     /**
