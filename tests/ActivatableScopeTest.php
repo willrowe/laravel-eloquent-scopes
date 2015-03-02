@@ -11,8 +11,9 @@ class ActivatableScopeTest extends \Orchestra\Testbench\TestCase
     public function setUp()
     {
         parent::setUp();
+
         $this->app['config']->set('database.default', 'sqlite');
-        $this->app['config']->set('database.connections.sqlite.database', __DIR__.'/../../../../app/database/production.sqlite');
+        $this->app['config']->set('database.connections.sqlite.database', ':memory:');
         $this->scope = new ActivatableScope();
         $this->model = new TestModel();
     }
