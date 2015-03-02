@@ -61,6 +61,7 @@ Version Compatibility
 Laravel | Response Cache
 --------|---------------
 4.2.x   | 1.0.x
+5.0.x   | 2.0.x
 
 License
 -------
